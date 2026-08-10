@@ -1,0 +1,4 @@
+window { background-color: #1e1e2e; color: #cdd6f4; border-radius: 10px; }
+#input { background-color: #181825; color: #cdd6f4; padding: 8px; border: none; }
+#entry { padding: 6px; }
+#entry:selected { background-color: #89b4fa; color: #1e1e2e; }
