@@ -102,7 +102,7 @@ print_status "Installing Helium browser from AUR..."
 if pacman -Q helium-browser-bin &> /dev/null; then
     print_warning "Helium browser is already installed"
 else
-    yay -S --noconfirm helium-browser-bin || print_warning "Helium browser installation failed"
+    yay -S --noconfirm --nodiff --nocleanmenu helium-browser-bin || print_warning "Helium browser installation failed"
 fi
 
 # =============================================================================
