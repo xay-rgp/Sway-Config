@@ -74,4 +74,4 @@ chmod +x setup.sh
 
 ---
 
-**Happy Sway'ing!** 🎯
+
