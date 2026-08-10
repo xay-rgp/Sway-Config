@@ -70,7 +70,7 @@ chmod +x setup.sh
 
 ⚠️ Do NOT run as root  
 ⚠️ Steam installation will prompt for GPU drivers  
-⚠️ Full installation takes 30-60 minutes
+⚠️ Full installation takes a couple minutes
 
 ---
 
