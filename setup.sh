@@ -191,16 +191,16 @@ detect_gpu() {
         local gpu_line
         gpu_line="$(lspci -nnk | grep -E 'VGA|3D' | head -n1 || true)"
         if [[ -n "$gpu_line" ]]; then
-            case "$gpu_line" in
-                *NVIDIA*|*Nvidia*|*nvidia*)
-                    vendor="nvidia";;
-                *AMD*|'*Advanced Micro Devices*'|*ATI*)
-                    vendor="amd";;
-                *Intel*|*Integrated Graphics*)
-                    vendor="intel";;
-                *)
-                    vendor="unknown";;
-            esac
+            # Use explicit [[ ... ]] checks to avoid issues with spaces in case patterns
+            if [[ "$gpu_line" == *NVIDIA* || "$gpu_line" == *Nvidia* || "$gpu_line" == *nvidia* ]]; then
+                vendor="nvidia"
+            elif [[ "$gpu_line" == *AMD* || "$gpu_line" == *Advanced\ Micro\ Devices* || "$gpu_line" == *ATI* ]]; then
+                vendor="amd"
+            elif [[ "$gpu_line" == *Intel* || "$gpu_line" == *Integrated\ Graphics* ]]; then
+                vendor="intel"
+            else
+                vendor="unknown"
+            fi
             info "Detected GPU line: ${gpu_line}"
         else
             vendor="unknown"
