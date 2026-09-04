@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# ==============================================================================
+# ===============================================================================
 # Arch Linux Sway Desktop Setup
-# ==============================================================================
+# ===============================================================================
 #
 # Installs the required packages, Flatpak applications, yay, AUR packages,
 # and deploys repository configuration files for a Sway desktop environment.
@@ -14,7 +14,7 @@
 #  - The script will call sudo for system-level operations only.
 #  - AUR builds (makepkg) are always run as the normal user.
 #
-# ==============================================================================
+# ===============================================================================
 
 set -euo pipefail
 IFS=$'\n\t'
@@ -194,7 +194,7 @@ detect_gpu() {
             case "$gpu_line" in
                 *NVIDIA*|*Nvidia*|*nvidia*)
                     vendor="nvidia";;
-                *AMD*|*Advanced Micro Devices*|*ATI*)
+                *AMD*|'*Advanced Micro Devices*'|*ATI*)
                     vendor="amd";;
                 *Intel*|*Integrated Graphics*)
                     vendor="intel";;
