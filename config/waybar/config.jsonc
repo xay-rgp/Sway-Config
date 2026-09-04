@@ -31,7 +31,7 @@
 
     "network": {
         "interface": "wlp*",
-        "format-wifi": "  {essid} {signalStrength}%",
+        "format-wifi": "  {essid} {signalStrength}%",
         "format-ethernet": "󰈀  {ipaddr}",
         "format-disconnected": "󰤭  Offline",
         "tooltip-format-wifi": "Connected to {essid}\nSignal: {signalStrength}%\nIP: {ipaddr}",
