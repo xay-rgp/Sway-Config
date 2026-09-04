@@ -87,12 +87,14 @@ print_status "Installing core packages..."
 
 CORE_PACKAGES=(
     "base-devel"
+    "debugedit"
+    "fakeroot"
     "git"
     "wget"
     "curl"
 )
 
-sudo pacman -S --noconfirm "${CORE_PACKAGES[@]}" || print_warning "Some core packages failed to install"
+sudo pacman -S --needed "${CORE_PACKAGES[@]}" || print_warning "Some core packages failed to install"
 
 # =============================================================================
 # 4. INSTALL HELIUM BROWSER FROM AUR
