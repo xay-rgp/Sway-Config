@@ -176,10 +176,10 @@ EOF'
 }
 
 # ------------------------------------------------------------------------------
-# 2. INSTALL PACMAN PACKAGES (with options for GPU drivers)
+# 2. INSTALL PACMAN PACKAGES (with options for Vulkan/Steam prompt)
 # ------------------------------------------------------------------------------
+# detect_gpu remains to provide a best-guess of vendor for Vulkan package selection
 detect_gpu() {
-    # Try to detect GPU vendor via lspci. If pciutils isn't installed, try to install it first.
     local vendor=""
     if ! command_exists lspci; then
         warn "lspci (pciutils) not found; installing pciutils to detect GPU (requires sudo)..."
@@ -187,16 +187,15 @@ detect_gpu() {
     fi
 
     if command_exists lspci; then
-        # Look for VGA/3D controller lines and try to identify vendor
         local gpu_line
         gpu_line="$(lspci -nnk | grep -E 'VGA|3D' | head -n1 || true)"
         if [[ -n "$gpu_line" ]]; then
-            # Use explicit [[ ... ]] checks to avoid issues with spaces in case patterns
-            if [[ "$gpu_line" == *NVIDIA* || "$gpu_line" == *Nvidia* || "$gpu_line" == *nvidia* ]]; then
+            # Use regex matching so vendor names with spaces don't break parsing
+            if [[ $gpu_line =~ [Nn]VIDIA ]]; then
                 vendor="nvidia"
-            elif [[ "$gpu_line" == *AMD* || "$gpu_line" == *Advanced\ Micro\ Devices* || "$gpu_line" == *ATI* ]]; then
+            elif [[ $gpu_line =~ ([Aa]MD|[Aa]dvanced[[:space:]]Micro[[:space:]]Devices|[Aa][Tt][Ii]) ]]; then
                 vendor="amd"
-            elif [[ "$gpu_line" == *Intel* || "$gpu_line" == *Integrated\ Graphics* ]]; then
+            elif [[ $gpu_line =~ ([Ii]ntel|[Ii]ntegrated[[:space:]]Graphics) ]]; then
                 vendor="intel"
             else
                 vendor="unknown"
@@ -214,47 +213,40 @@ detect_gpu() {
     echo "${vendor}"
 }
 
-choose_and_install_drivers() {
+# Prompt the user about Vulkan + lib32 packages Steam/Proton needs. Keep this prompt interactive; everything
+# else in the script remains --noconfirm for pacman operations.
+install_steam_vulkan_prompt() {
     local vendor
     vendor="$(detect_gpu)"
-    info "GPU vendor guess: ${vendor}"
+    info "Detected GPU vendor (for Vulkan package suggestions): ${vendor}"
 
-    # Present options for user to explicitly choose drivers. We never silently install drivers.
-    echo ""
-    info "Driver installation choices:"
-    echo "  1) No driver packages (skip)"
-    echo "  2) Install AMD recommended packages: ${DRIVERS_AMD[*]}"
-    echo "  3) Install Intel recommended packages: ${DRIVERS_INTEL[*]}"
-    echo "  4) Install NVIDIA (proprietary) recommended packages: ${DRIVERS_NVIDIA[*]}"
-    echo ""
-    warn "If you're unsure, choose option 1 and install drivers manually later. Do NOT install conflicting drivers."
-    printf "Your choice [default: 1]: "
-    read -r choice || choice=1
-
-    local selected=()
-    case "${choice}" in
-        2)
-            selected=("${DRIVERS_AMD[@]}");;
-        3)
-            selected=("${DRIVERS_INTEL[@]}");;
-        4)
-            selected=("${DRIVERS_NVIDIA[@]}");;
+    local pkgs=()
+    case "${vendor}" in
+        amd)
+            pkgs=(vulkan-radeon lib32-vulkan-radeon lib32-mesa)
+            ;;
+        intel)
+            pkgs=(vulkan-intel lib32-vulkan-intel lib32-mesa)
+            ;;
+        nvidia)
+            pkgs=(nvidia-utils lib32-nvidia-utils)
+            ;;
         *)
-            info "Skipping GPU driver installation."
-            return 0;;
+            # Generic fallback to lib32-mesa which covers many cases
+            pkgs=(lib32-mesa)
+            ;;
     esac
 
-    # Check for conflicts: e.g., don't install nvidia and mesa-only choices that would conflict.
-    if [[ " ${selected[*]} " == *"nvidia"* ]] && pacman_installed "xf86-video-amdgpu" ; then
-        warn "NVIDIA selection may conflict with already installed AMD drivers. Confirm to continue."
-        read -rp "Proceed with installing NVIDIA driver packages? [y/N]: " yn
-        case "${yn}" in [Yy]* ) ;; * ) info "Driver installation cancelled."; return 0;; esac
+    printf "\nInstall Vulkan + 32-bit compatibility packages required by Steam/Proton? [Y/n]: "
+    read -r yn
+    yn="${yn:-Y}"
+    if [[ "${yn}" =~ ^[Yy]$ ]]; then
+        info "Installing Vulkan / lib32 packages: ${pkgs[*]}"
+        sudo pacman -S --noconfirm --needed "${pkgs[@]}"
+        success "Attempted to install Vulkan / lib32 packages."
+    else
+        info "Skipping Vulkan / lib32 package installation as requested."
     fi
-
-    # Install the chosen driver packages via pacman
-    info "Installing chosen driver packages: ${selected[*]}"
-    sudo pacman -S --noconfirm --needed "${selected[@]}"
-    success "GPU driver candidate packages installation attempted."
 }
 
 install_pacman_packages() {
@@ -276,8 +268,8 @@ install_pacman_packages() {
         success "All pacman packages already installed."
     fi
 
-    # Offer GPU driver installation after core packages are in place
-    choose_and_install_drivers
+    # Keep a user-facing prompt for Steam/Vulkan compatibility packages (interactive).
+    install_steam_vulkan_prompt
 }
 
 # ------------------------------------------------------------------------------
