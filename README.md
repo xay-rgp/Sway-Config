@@ -23,3 +23,24 @@ Run as a normal user (not root) — it calls `sudo` internally when needed.
 - Installs Mission Center via Flatpak
 - Copies everything from `config/` into `~/.config/`
 - Adds `fastfetch` to `~/.bashrc`
+
+
+                  -`
+                 .o+`
+                `ooo/
+               `+oooo:
+              `+oooooo:
+              -+oooooo+:
+            `/:-:++oooo+:
+           `/++++/+++++++:
+          `/++++++++++++++:
+         `/+++o oooooooo oooo/`
+        ./ooosssso++osssssso+`
+       .oossssso-````/ossssss+`
+      -osssssso.      :ssssssso.
+     :osssssss/        osssso+++.
+    /ossssssss/        +ssssooo/-
+  `/ossssso+/:-        -:/+osssso+-
+ `+sso+:-`                 `.-/+oso:
+`++:.                           `-/+/
+.`                                 `/
