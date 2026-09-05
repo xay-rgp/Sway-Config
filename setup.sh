@@ -62,6 +62,7 @@ sudo pacman -Syu --noconfirm
 ### 2. Install official repo packages (noconfirm) - everything except steam
 ### ---------------------------------------------------------------------
 PACMAN_PACKAGES=(
+    sway
     discord
     flatpak
     swaybg
