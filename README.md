@@ -2,7 +2,7 @@
 
 Sway (Wayland) dotfiles for Arch Linux, with a setup script to provision a fresh install.
 
-## Structure
+
 
 
 ## Usage
